@@ -1,28 +1,13 @@
-<!DOCTYPE html>
+{% extends 'rango/base.html' %}
 {% load staticfiles %}
 
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Rango</title>
+{% block body_block %}
 
-    <link rel="stylesheet" href="{% static "css/base.css" %}"/ >
-
-    <script src="{% static "js/jquery.js" %}"></script>
-</head>
-<body>
-    <h1>Rango says...</h1>
-    <div>
-        Hey there partner ! <br />
-        <strong> {{ blodmessage }}</strong> <br />
-    </div>
-
-    <div>
     <h1>Most Liked Categories</h1>
     {% if categories %}
     <ul>
       {% for category in categories %}
-      <li> <a href="/rango/category/{{ category.slug }}">{{ category.name }} </a></li>
+      <li> <a href="{% url 'show_category' category.slug%}">{{ category.name }} </a></li>
 
       {% endfor %}
     </ul>
@@ -30,8 +15,6 @@
       <strong>There are no categories present</strong>
     {% endif %}
     </div>
-
-
     <div>
         <h1>Mosted Viewed Pages</h1>
         {% if pages %}
@@ -45,12 +28,4 @@
         {% endif %}
     </div>
 
-    <div>
-        <a href="/rango/add_category/">Add New Category</a>
-    </div>
-    <div>
-        <a href="/rango/about">About</a> <br />
-        <img src="{{MEDIA_URL}}cat.jpg" alt="Picture of Rango" </img>
-    </div>
-</body>
-</html>
+{% endblock %}

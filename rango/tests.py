@@ -2,9 +2,10 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.contrib.staticfiles import finders
 
+
 # Thanks to Enzo Roiz https://github.com/enzoroiz who made these tests during an internship with us
 
-        
+
 class ModelTests(TestCase):
 
     def setUp(self):
@@ -17,29 +18,28 @@ class ModelTests(TestCase):
             print('The function populate() does not exist or is not correct')
         except:
             print('Something went wrong in the populate() function :-(')
-        
-        
+
     def get_category(self, name):
-        
+
         from rango.models import Category
-        try:                  
+        try:
             cat = Category.objects.get(name=name)
-        except Category.DoesNotExist:    
+        except Category.DoesNotExist:
             cat = None
         return cat
-        
+
     def test_python_cat_added(self):
-        cat = self.get_category('Python')  
+        cat = self.get_category('Python')
         self.assertIsNotNone(cat)
-         
+
     def test_python_cat_with_views(self):
         cat = self.get_category('Python')
         self.assertEquals(cat.views, 128)
-        
+
     def test_python_cat_with_likes(self):
         cat = self.get_category('Python')
         self.assertEquals(cat.likes, 64)
-        
+
 
 class Chapter4ViewTests(TestCase):
     def test_index_contains_hello_message(self):
@@ -83,7 +83,6 @@ class Chapter5ViewTests(TestCase):
         except:
             print('Something went wrong in the populate() function :-(')
 
-
     def get_category(self, name):
 
         from rango.models import Category
@@ -109,7 +108,7 @@ class Chapter5ViewTests(TestCase):
     def test_view_has_title(self):
         response = self.client.get(reverse('index'))
 
-        #Check title used correctly
+        # Check title used correctly
         self.assertIn('<title>', response.content)
         self.assertIn('</title>', response.content)
 
@@ -135,24 +134,20 @@ class Chapter6ViewTests(TestCase):
         except:
             print('Something went wrong in the populate() function :-(')
 
-
     # are categories displayed on index page?
 
     # does the category model have a slug field?
-
 
     # test the slug field works..
     def test_does_slug_field_work(self):
         from rango.models import Category
         cat = Category(name='how do i create a slug in django')
         cat.save()
-        self.assertEqual(cat.slug,'how-do-i-create-a-slug-in-django')
+        self.assertEqual(cat.slug, 'how-do-i-create-a-slug-in-django')
 
     # test category view does the page exist?
 
-
     # test whether you can navigate from index to a category page
-
 
     # test does index page contain top five pages?
 
@@ -184,9 +179,7 @@ class Chapter7ViewTests(TestCase):
 
     # test is there an category page?
 
-
     # test if index contains link to add category page
-    #<a href="/rango/add_category/">Add a New Category</a><br />
-
+    # <a href="/rango/add_category/">Add a New Category</a><br />
 
     # test if the add_page.html template exists.

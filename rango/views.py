@@ -2,16 +2,13 @@ from django.shortcuts import render
 from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import  reverse
 from django.contrib.auth.decorators import login_required
-
 from django.contrib.auth import authenticate, login, logout
-
 from rango.models import Category
 from rango.models import Page
 from rango.form import CategoryForm
 from rango.form import PageForm
 from rango.form import UserForm
 from rango.form import UserProfileForm
-
 
 
 def index(request):
@@ -40,6 +37,7 @@ def show_category(request, category_name_slug):
 
     return render(request, "rango/category.html", context_dict)
 
+
 @login_required
 def add_category(request):
     form = CategoryForm()
@@ -52,6 +50,7 @@ def add_category(request):
         else:
             print(form.errors)
     return render(request, 'rango/add_category.html', {'form': form})
+
 
 @login_required
 def add_page(request, category_name_slug):
@@ -75,9 +74,9 @@ def add_page(request, category_name_slug):
 
 
 def about(request):
-    dict = {"about_message": "this is about page"
-        , "myname": "YuanSuyi"}
-    return render(request, "rango/about.html", context=dict)
+    context_dict = {"about_message": "this is about page",
+                    "myname": "YuanSuyi"}
+    return render(request, "rango/about.html", context=context_dict)
 
 
 def register(request):
@@ -114,12 +113,14 @@ def register(request):
         'registered': registered
     })
 
+
 def user_logout(request):
     if request.user.is_authenticated:
         logout(request)
         return HttpResponseRedirect(reverse('index'))
     else:
         return HttpResponse('You are not loged')
+
 
 def user_login(request):
     if request.method == 'POST':

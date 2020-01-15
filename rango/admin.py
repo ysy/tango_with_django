@@ -17,4 +17,6 @@ class CategoryAdmim(admin.ModelAdmin):
 
 admin.site.register(rango.models.Page, PageAdmin)
 admin.site.register(rango.models.Category, CategoryAdmim)
+admin.site.register(rango.models.UserProfile)
+
 # admin.site.register(Category)

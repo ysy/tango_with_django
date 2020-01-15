@@ -22,9 +22,11 @@
             <strong>There is not page in Category</strong>
         {% endif%}
     </div>
+    {% if request.user.is_authenticated %}
     <div>
         <a href="{% url 'add_page' category.slug%}">Add Page</a>
     </div>
+    {% endif %}
 
     {% else %}
         <div>The category does not exist</div>

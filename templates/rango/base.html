@@ -8,6 +8,11 @@
     <title>Rango - {% block title_block %} How to tango with django {% endblock%}</title>
 </head>
 <body>
+    {% if request.user %}
+    <div>
+        <h1>Hello {{request.user.username}}</h1>
+    </div>
+    {% endif %}
     <div>
         {% block sidebar_block %}
         {% get_categories_list category %}
@@ -23,9 +28,17 @@
 
     <div>
         <ul>
-            <li><a href="{% url 'add_category' %}"> Add Category</a></li>
+
             <li><a href="{% url 'about' %}"> About</a></li>
             <li><a href="{% url 'index' %}">Index</a></li>
+
+            {% if user.is_authenticated %}
+                <li><a href="{% url 'add_category' %}"> Add New Category</a></li>
+                 <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+                <li><a href="{% url 'register' %}">Register</a></li>
+            {% endif %}
         </ul>
     </div>
 </body>

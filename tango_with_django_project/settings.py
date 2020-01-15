@@ -131,3 +131,5 @@ STATIC_URL = '/static/'
 MEDIA_ROOT = MEDIA_DIR
 print(MEDIA_ROOT)
 MEDIA_URL = '/media/'
+
+LOGIN_URL = '/rango/login/'

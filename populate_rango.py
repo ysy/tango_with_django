@@ -63,8 +63,8 @@ def add_page(cat, title, url, views=0):
 
 
 def main():
+    #myfunc(1, 2, 3)
     populate()
-
 
 if __name__ == "__main__":
     main()

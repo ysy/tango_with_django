@@ -1,5 +1,7 @@
 <!DOCTYPE html>
+{% load rango_template_tags %}
 {% load staticfiles %}
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -7,9 +9,14 @@
 </head>
 <body>
     <div>
+        {% block sidebar_block %}
+        {% get_categories_list category %}
+        {% endblock %}
+    </div>
+    <div>
     {% block body_block %}
         this is default content of body_block
-        {% endblock %}
+    {% endblock %}
     </div>
 
     <hr />

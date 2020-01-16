@@ -3,6 +3,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.core.urlresolvers import  reverse
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
+from datetime import datetime
 from rango.models import Category
 from rango.models import Page
 from rango.form import CategoryForm
@@ -11,17 +12,42 @@ from rango.form import UserForm
 from rango.form import UserProfileForm
 
 
+def get_server_side_cookie(request, cookie, default=""):
+    val = request.session.get(cookie)
+    if not val:
+        val = default
+    return val
+
+
+def visitor_cookie_hander(request):
+    visits = get_server_side_cookie(request, 'visits', 1)
+    last_visit_time = get_server_side_cookie(request, 'last_visit', datetime.now().timestamp())
+
+    try:
+        if (datetime.now() - datetime.fromtimestamp(last_visit_time)).seconds > 3:
+            visits += 1
+            last_visit_time = datetime.now().timestamp()
+    except ValueError:
+        visits = 1
+        last_visit_time = datetime.now().timestamp()
+
+    request.session['visits'] = visits
+    request.session['last_visit'] = last_visit_time
+
+
 def index(request):
     # dict = {
     #     "blodmessage" : "Curnchy, creamy, cookies, candy, cpucake!"
     # }
     # return render(request, 'rango/index.html', context=dict)
+    request.session.set_test_cookie()
     category_list = Category.objects.order_by('-likes')[:5]
     page_list = Page.objects.order_by('-views')[:5]
 
     context_dict = {"categories": category_list, "pages": page_list}
-    return render(request, 'rango/index.html', context_dict)
-
+    response = render(request, 'rango/index.html', context_dict)
+    visitor_cookie_hander(request)
+    return response
 
 def show_category(request, category_name_slug):
     context_dict = {}
@@ -74,6 +100,9 @@ def add_page(request, category_name_slug):
 
 
 def about(request):
+    if request.session.test_cookie_worked():
+        print("TEST COOKIE WORKED")
+        request.session.delete_test_cookie()
     context_dict = {"about_message": "this is about page",
                     "myname": "YuanSuyi"}
     return render(request, "rango/about.html", context=context_dict)
@@ -139,3 +168,7 @@ def user_login(request):
     else:
         return render(request, 'rango/login.html', {})
 
+
+@login_required()
+def restricted(request):
+    return render(request, "rango/restricted.html", {})

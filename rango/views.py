@@ -19,7 +19,7 @@ def get_server_side_cookie(request, cookie, default=""):
     return val
 
 
-def visitor_cookie_hander(request):
+def visitor_cookie_handler(request):
     visits = get_server_side_cookie(request, 'visits', 1)
     last_visit_time = get_server_side_cookie(request, 'last_visit', datetime.now().timestamp())
 
@@ -46,8 +46,9 @@ def index(request):
 
     context_dict = {"categories": category_list, "pages": page_list}
     response = render(request, 'rango/index.html', context_dict)
-    visitor_cookie_hander(request)
+    visitor_cookie_handler(request)
     return response
+
 
 def show_category(request, category_name_slug):
     context_dict = {}
@@ -105,6 +106,7 @@ def about(request):
         request.session.delete_test_cookie()
     context_dict = {"about_message": "this is about page",
                     "myname": "YuanSuyi"}
+    visitor_cookie_handler(request)
     return render(request, "rango/about.html", context=context_dict)
 
 

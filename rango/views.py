@@ -174,3 +174,19 @@ def user_login(request):
 @login_required()
 def restricted(request):
     return render(request, "rango/restricted.html", {})
+
+
+def track_url(request):
+    page_id = request.GET.get('page_id', None)
+    url = reverse('index')
+    try:
+        if page_id is not None:
+            page_id = int(page_id)
+            page = Page.objects.get(id=page_id)
+            if page is not None:
+                url = page.url
+                page.views += 1
+                page.save()
+    except ValueError:
+        pass
+    return HttpResponseRedirect(url)

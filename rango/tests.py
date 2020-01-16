@@ -1,185 +1,52 @@
 from django.test import TestCase
 from django.core.urlresolvers import reverse
-from django.contrib.staticfiles import finders
+from rango.models import Category
 
 
-# Thanks to Enzo Roiz https://github.com/enzoroiz who made these tests during an internship with us
-
-
-class ModelTests(TestCase):
-
-    def setUp(self):
-        try:
-            from populate_rango import populate
-            populate()
-        except ImportError:
-            print('The module populate_rango does not exist')
-        except NameError:
-            print('The function populate() does not exist or is not correct')
-        except:
-            print('Something went wrong in the populate() function :-(')
-
-    def get_category(self, name):
-
-        from rango.models import Category
-        try:
-            cat = Category.objects.get(name=name)
-        except Category.DoesNotExist:
-            cat = None
-        return cat
-
-    def test_python_cat_added(self):
-        cat = self.get_category('Python')
-        self.assertIsNotNone(cat)
-
-    def test_python_cat_with_views(self):
-        cat = self.get_category('Python')
-        self.assertEquals(cat.views, 128)
-
-    def test_python_cat_with_likes(self):
-        cat = self.get_category('Python')
-        self.assertEquals(cat.likes, 64)
-
-
-class Chapter4ViewTests(TestCase):
-    def test_index_contains_hello_message(self):
-        # Check if there is the message 'hello world!'
-        response = self.client.get(reverse('index'))
-        self.assertIn('Rango says', response.content)
-
-    def test_does_index_contain_img(self):
-        # Check if the index page contains an img
-        response = self.client.get(reverse('index'))
-        self.assertIn('img', response.content)
-
-    def test_about_using_template(self):
-        # Check the template used to render index page
-        # Exercise from Chapter 4
-        response = self.client.get(reverse('about'))
-
-        self.assertTemplateUsed(response, 'rango/about.html')
-
-    def test_does_about_contain_img(self):
-        # Check if in the about page contains an image
-        response = self.client.get(reverse('about'))
-        self.assertIn('img', response.content)
-
-    def test_about_contains_create_message(self):
-        # Check if in the about page contains the message from the exercise
-        response = self.client.get(reverse('about'))
-        self.assertIn('This tutorial has been put together by', response.content)
-
-
-class Chapter5ViewTests(TestCase):
-
-    def setUp(self):
-        try:
-            from populate_rango import populate
-            populate()
-        except ImportError:
-            print('The module populate_rango does not exist')
-        except NameError:
-            print('The function populate() does not exist or is not correct')
-        except:
-            print('Something went wrong in the populate() function :-(')
-
-    def get_category(self, name):
-
-        from rango.models import Category
-        try:
-            cat = Category.objects.get(name=name)
-        except Category.DoesNotExist:
-            cat = None
-        return cat
-
-    def test_python_cat_added(self):
-        cat = self.get_category('Python')
-        self.assertIsNotNone(cat)
-
-    def test_python_cat_with_views(self):
-        cat = self.get_category('Python')
-
-        self.assertEquals(cat.views, 128)
-
-    def test_python_cat_with_likes(self):
-        cat = self.get_category('Python')
-        self.assertEquals(cat.likes, 64)
-
-    def test_view_has_title(self):
-        response = self.client.get(reverse('index'))
-
-        # Check title used correctly
-        self.assertIn('<title>', response.content)
-        self.assertIn('</title>', response.content)
-
-    # Need to add tests to:
-    # check admin interface - is it configured and set up
-
-    def test_admin_interface_page_view(self):
-        from admin import PageAdmin
-        self.assertIn('category', PageAdmin.list_display)
-        self.assertIn('url', PageAdmin.list_display)
-
-
-class Chapter6ViewTests(TestCase):
-
-    def setUp(self):
-        try:
-            from populate_rango import populate
-            populate()
-        except ImportError:
-            print('The module populate_rango does not exist')
-        except NameError:
-            print('The function populate() does not exist or is not correct')
-        except:
-            print('Something went wrong in the populate() function :-(')
-
-    # are categories displayed on index page?
-
-    # does the category model have a slug field?
-
-    # test the slug field works..
-    def test_does_slug_field_work(self):
-        from rango.models import Category
-        cat = Category(name='how do i create a slug in django')
+class CategoryMethodTests(TestCase):
+    def test_ensure_category_views_are_postive(self):
+        """
+            views of Category should be >= 0
+        :return:
+        """
+        cat = Category(name='test', views=-1, likes=0)
         cat.save()
-        self.assertEqual(cat.slug, 'how-do-i-create-a-slug-in-django')
+        self.assertEqual((cat.views >= 0), True)
 
-    # test category view does the page exist?
+    def test_ensure_category_likes_are_postive(self):
+        cat = Category(name='test', views=0, likes=-1)
+        cat.save()
+        self.assertEqual((cat.likes >= 0), True)
 
-    # test whether you can navigate from index to a category page
-
-    # test does index page contain top five pages?
-
-    # test does index page contain the words "most liked" and "most viewed"
-
-    # test does category page contain a link back to index page?
+    def test_slug_createor(self):
+        cat = Category(name='Some Random Name')
+        cat.save()
+        self.assertEqual(cat.slug, 'some-random-name')
 
 
-class Chapter7ViewTests(TestCase):
+def add_cat(name, views, likes):
+    c = Category.objects.get_or_create(name=name)[0]
+    c.views = views
+    c.likes = likes
+    c.save()
+    return c
 
-    def setUp(self):
-        try:
-            from forms import PageForm
-            from forms import CategoryForm
 
-        except ImportError:
-            print('The module forms does not exist')
-        except NameError:
-            print('The class PageForm does not exist or is not correct')
-        except:
-            print('Something else went wrong :-(')
+class IndexViewTests(TestCase):
 
-    pass
-    # test is there a PageForm in rango.forms
+    def test_index_view_with_no_categories(self):
+        response = self.client.get(reverse('index'))
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerysetEqual(response.context['categories'], [])
 
-    # test is there a CategoryForm in rango.forms
+    def test_index_view_with_categories(self):
+        add_cat("test", 1, 1)
+        add_cat("test1", 1, 1)
+        add_cat("test2", 1, 1)
+        add_cat("test3", 1, 1)
+        add_cat("test4", 1, 1)
 
-    # test is there an add page page?
-
-    # test is there an category page?
-
-    # test if index contains link to add category page
-    # <a href="/rango/add_category/">Add a New Category</a><br />
-
-    # test if the add_page.html template exists.
+        response = self.client.get(reverse('index'))
+        self.assertEqual(response.status_code, 200)
+        num_cats = len(response.context['categories'])
+        self.assertEqual(num_cats, 5)
